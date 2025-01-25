@@ -1,0 +1,366 @@
+<div class="container  min-vw-100 overflow-auto pb-5">
+   <div class="search-form-container my-5 ">
+      <div class="search-form p-2 ">
+         <form (submit)="submitSearch(searchForm.value); $event.preventDefault()" #searchForm="ngForm" class="needs-validation" ngNativeValidate>
+            <div class="form-group">
+              <h1 id="headline">Events Search</h1>
+               <hr style="color: white" />
+              <label for="keyword">Keyword<span style="color: red; padding-left: 5px">*</span></label>
+              <div>
+                <input type="text" class="form-control" id="keyword" name="keyword" [ngModel]="keywordControl.value" (ngModelChange)="keywordControl.setValue($event)" required #keywordInput="ngModel" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayKeyword" (optionSelected)="onKeywordSelected($event)">
+                  <mat-option *ngFor="let keyword of (filteredKeywords | async)" [value]="keyword">
+                    {{ keyword }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+            <div class="form-group d-flex flex-row ">
+               <div class="form-group">
+                  <label for="distance">Distance</label>
+                  <input type="number" class="form-control" id="distance" [(ngModel)]="distance" name="distance"  required>
+               </div>
+               <div class="form-group">
+                  <label for="category">Category<span style="color: red; padding-left: 5px">*</span></label>
+                  <select class="form-select" id="category" name="category" ngModel #categoryInput="ngModel" required>
+                     <option value="Default" selected>Default</option>
+                     <option value="Music">Music</option>
+                     <option value="Sports">Sports</option>
+                     <option value="Art">Art & Theatre</option>
+                     <option value="Film">Film</option>
+                     <option value="Miscellaneous">Miscellaneous</option>
+                  </select>
+                  <div *ngIf="categoryInput.invalid && categoryInput.touched" class="invalid-feedback">
+        Please choose a category.
+    </div>
+               </div>
+            </div>
+            <div class="form-group">
+               <label for="location">Location<span style="color: red; padding-left: 5px">*</span></label>
+               <input type="text" class="form-control" id="location" name="location" [disabled]="autoDetect" ngModel required>
+
+            </div>
+            <div class="form-check">
+               <input type="checkbox" class="form-check-input" id="autoDetect" name="autoDetect" [(ngModel)]="autoDetect" (change)="fetchLoc()">
+               <label class="form-check-label" for="autoDetect">Auto-detect your location</label>
+            </div>
+           <div class="d-flex flex-row justify-content-center align-items-center " >
+             <button type="submit" class="btn btn-danger mt-3 " style=" color: white">SUBMIT</button>
+           <button type="button" class="btn btn-primary mt-3" style="color: white" (click)="clearSearch(searchForm)">CLEAR</button>
+           </div>
+
+
+         </form>
+      </div>
+   </div>
+
+   <div *ngIf="!selectedEvent  && showResults" class="mt-5  overflow-scroll" style="width: 80%">
+
+      <div *ngIf="events.length > 0" class="mt-5  overflow-scroll" >
+        <table class="table table-striped table-bordered table-dark table-hover tabel-lg text-center ">
+          <thead>
+            <tr>
+              <th scope="col">Date/Time</th>
+              <th scope="col">Icon</th>
+              <th scope="col">Event</th>
+              <th scope="col">Genre</th>
+              <th scope="col">Venue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let event of events | slice:0:20 " (click)="onEventRowClick(event.id)" >
+              <td>{{ event.dates.start.localDate }} {{ event.dates.start.localTime }}</td>
+              <td>
+                <img [src]="event.images[0].url" [alt]="event.name" width="60" height="60" />
+              </td>
+              <td>{{ event.name }}</td>
+              <td>{{ event.classifications[0].genre.name }}</td>
+              <td>{{ event._embedded.venues[0].name }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="events.length === 0 && searchCompleted" class="mt-5 " style="text-align: center">
+        <p style="background: white; color: red; font-size: 25px">No results available</p>
+      </div>
+
+  </div>
+
+
+  <!-- Add the tabs and their content here -->
+  <div *ngIf="selectedEvent  && showResults" class="details-card mt-5" style="width: 70%">
+      <button (click)="onBackButtonClick(); resetSelectedTab()" class="btn btn-outline-light mb-3">Back</button>
+  <div class="event-name " style="text-align: center; color: white">
+      <div class="d-flex flex-row justify-content-center">
+        <h2>{{ selectedEvent.name }}</h2>
+        <i (click)="toggleFavorite()" [ngClass]="isFavorite ? 'fa fa-heart cus-fa-size rounded-circle  text-danger bg-white' : 'fa fa-heart-o cus-fa-size rounded-circle text-black bg-white'" class="heart-icon"></i>
+      </div>
+
+
+  </div>
+
+  <ul class="nav nav-tabs bg-mint flex-nowrap d-flex justify-content-center" style="margin-bottom: 20px" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link text-white" [ngClass]="{'active': selectedTab === 'event-details', 'selected-tab': selectedTab === 'event-details'}" id="event-details-tab" href="javascript:void(0)" role="tab" aria-controls="event-details" aria-selected="true" (click)="selectTab('event-details')">Event Details</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white" [ngClass]="{'active': selectedTab === 'artists-teams', 'selected-tab': selectedTab === 'artists-teams'}" id="artists-teams-tab" href="javascript:void(0)" role="tab" aria-controls="artists-teams" aria-selected="false" (click)="selectTab('artists-teams')">Artists/Teams</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white" [ngClass]="{'active': selectedTab === 'venue', 'selected-tab': selectedTab === 'venue'}" id="venue-tab" href="javascript:void(0)" role="tab" aria-controls="venue" aria-selected="false" (click)="selectTab('venue')">Venue</a>
+      </li>
+
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade " [ngClass]="{'show active': selectedTab === 'event-details'}" id="event-details" role="tabpanel" aria-labelledby="event-details-tab">
+      <div class="row justify-content-center">
+        <div class="col-md-6  d-flex flex-column justify-content-center details-table" style="text-align: center" >
+          <div *ngIf="selectedEvent.dates.start.localDate || selectedEvent.dates.start.localTime" class="d-flex flex-column justify-content-center">
+            <strong>Date</strong>
+            <p>{{ selectedEvent.dates.start.localDate }} {{ selectedEvent.dates.start.localTime }}</p>
+          </div>
+
+
+          <div *ngIf="selectedEvent._embedded.attractions  && selectedEvent._embedded.attractions.length > 0" class="d-flex flex-column justify-content-center" style="text-align: center">
+            <strong>Artists/Team</strong>
+            <div class="d-flex flex-row justify-content-center " style="text-align: center">
+              <span *ngFor="let attraction of selectedEvent._embedded.attractions; let i = index" style="text-align: center">
+              {{attraction.name}}
+                <span *ngIf="i < selectedEvent._embedded.attractions.length - 1"> | </span>
+            </span>
+            </div>
+
+          </div>
+          <div *ngIf="selectedEvent._embedded.venues" class="d-flex flex-column justify-content-center">
+            <strong>Venue</strong>
+          <p>{{ selectedEvent._embedded.venues[0].name }}</p>
+          </div >
+          <!-- GENRE -->
+          <div *ngIf="selectedEvent.classifications" class="d-flex flex-column justify-content-center" style="text-align: center">
+            <strong>Genres</strong>
+            <div class="d-flex flex-row justify-content-center " style="text-align: center">
+              <p *ngIf="selectedEvent.classifications[0].genre?.name">
+              {{ selectedEvent.classifications[0].genre.name }} |
+            </p>
+              <p *ngIf="selectedEvent.classifications[0].segment?.name">
+              {{ selectedEvent.classifications[0].segment.name }}
+            </p>
+
+            <p *ngIf="selectedEvent.classifications[0].subGenre?.name">
+             | {{ selectedEvent.classifications[0].subGenre.name }}
+            </p>
+            </div>
+          </div>
+          <div *ngIf="selectedEvent.priceRanges" class="d-flex flex-column justify-content-center">
+            <strong>Price Ranges</strong>
+          <p *ngIf="selectedEvent.priceRanges">{{ selectedEvent.priceRanges[0].min }} - {{ selectedEvent.priceRanges[0].max }} USD</p>
+          </div>
+          <div *ngIf="selectedEvent.dates.status" class="d-flex flex-column justify-content-center">
+            <strong>Ticket Status</strong>
+            <span class="status" [ngClass]="{'onsale': selectedEvent.dates.status.code === 'onsale',
+                  'offsale': selectedEvent.dates.status.code === 'offsale',
+                  'canceled': selectedEvent.dates.status.code === 'canceled',
+                  'postponed': selectedEvent.dates.status.code === 'postponed' || selectedEvent.dates.status.code === 'rescheduled'}">
+              {{ selectedEvent.dates.status.code === 'onsale' ? 'On Sale' :
+                 selectedEvent.dates.status.code === 'offsale' ? 'Off Sale' :
+                 selectedEvent.dates.status.code === 'canceled' ? 'Canceled' :
+                 selectedEvent.dates.status.code === 'postponed' ? 'Postponed' :
+                   selectedEvent.dates.status.code === 'rescheduled' ? 'Rescheduled' : '' }}
+            </span>
+          </div>
+
+
+
+          <div *ngIf="selectedEvent.url" class="d-flex flex-column justify-content-center">
+            <strong>Buy Ticket At:</strong>
+            <p><a href="{{ selectedEvent.url }}" target="_blank">Ticketmaster</a></p>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <img *ngIf="selectedEvent.seatmap" [src]="selectedEvent.seatmap.staticUrl" [alt]="selectedEvent.name + ' Seat Map'" class="img-fluid" />
+        </div>
+      </div>
+
+      <div class="share-icons">
+        <!--this part of code was modified from https://stackoverflow.com/questions/72519524/how-to-implement-sharing-to-facebook-twitter-functionality-in-angular -->
+        <p style="color: white">Share on: </p>
+        <a
+          href="http://twitter.com/share?text=Check {{selectedEvent.name}} on Ticketmaster&url={{selectedEvent.url}}&hashtags=event,search"
+          target="_blank"
+        >
+          <img src="assets/icons8-twitter-48.png" alt="Share on Twitter" />
+        </a>
+        <a
+          target="_blank"
+          href="https://www.facebook.com/sharer/sharer.php?u={{selectedEvent.url}}&amp;src=sdkpreparse"
+        >
+          <img src="assets/icons8-facebook-48.png" alt="Share on Facebook" />
+        </a>
+
+      </div>
+
+    </div>
+
+    <div class="tab-pane fade" [ngClass]="{'show active': selectedTab === 'artists-teams'}" id="artists-teams" role="tabpanel" aria-labelledby="artists-teams-tab">
+  <!-- Add code to display Artists/Teams details here -->
+  <ng-container *ngIf="selectedEvent && artistInfo && artistInfo.length > 0" style="background: transparent">
+    <div id="artistCarousel" class="carousel slide" [ngClass]="{'carousel-multi-item': artistInfo.length > 1}"  style="background: transparent">
+      <div class="carousel-inner" role="listbox">
+        <div class="carousel-content-container">
+        <div *ngFor="let artist of artistInfo; let i = index" class="carousel-item" [ngClass]="{'active': i === 0}">
+          <div class="card mb-2" style="background: transparent;">
+            <div class="row music_artist_info">
+              <div class="col-12 col-sm-3 d-flex flex-column justify-content-center align-items-center">
+                <img [src]="artist.images[1]?.url" class="img-fluid rounded-circle" alt="Artist Image" style="max-width: 150px; max-height: 150px">
+                <span class="card-title">{{ artist.name }}</span>
+              </div>
+              <div class="col-12 col-sm-3 d-flex flex-column justify-content-center align-items-center">
+                <span>Popularity</span>
+                <div class="d-flex justify-content-center align-items-center" style="position:relative;">
+                  <mat-progress-spinner mode="determinate" value="{{artist.popularity}}" diameter="50" [color]="'warn'"></mat-progress-spinner>
+                  <span style="position:absolute; font-weight: bold; color: white">{{ artist.popularity }}%</span>
+                </div>
+              </div>
+              <div class="col-12 col-sm-3 d-flex flex-column justify-content-center align-items-center">
+                <span>Followers</span>
+                <p style="color: white">{{ artist.followers.total }}</p>
+              </div>
+              <div class="col-12 col-sm-3 d-flex flex-column justify-content-center align-items-center">
+                <span>Spotify Link</span>
+                <a href="{{artist.external_urls.spotify}}" target="_blank">
+                  <img src="assets/spotify_icon.png" alt="Spotify Icon" class="img-fluid" width="24">
+                </a>
+              </div>
+            </div>
+
+            <div class="row mt-2">
+              <div class="col text-center justify-content-start align-items-start" style="color: aqua; font-size: 15px">
+                <span class="album-featuring-text">Albums featuring {{ artist.name }}</span>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12 col-sm-4" *ngFor="let album of (artist.albums || []).slice(0, 3)">
+                <img [src]="album.images[1]?.url" class="img-fluid" alt="Album Image">
+              </div>
+            </div>
+          </div>
+        </div>
+          </div>
+      </div>
+
+    </div>
+          <ng-container *ngIf="artistInfo.length > 1">
+        <a class="carousel-control-prev carousel-control-custom pe-5" href="#artistCarousel" role="button" (click)="prevSlide($event)">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </a>
+        <a class="carousel-control-next carousel-control-custom ps-5" href="#artistCarousel" role="button" (click)="nextSlide($event)">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </a>
+      </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="selectedEvent && (!artistInfo || artistInfo.length === 0)" style="text-align: center; margin-top: 30px">
+    <p style="background: white; color: red; font-size: 20px; text-align: center">No music related artist details to show</p>
+  </ng-container>
+</div>
+
+
+
+  <div class="tab-pane fade " [ngClass]="{'show active': selectedTab === 'venue'}" id="venue" role="tabpanel" aria-labelledby="venue-tab">
+  <ng-container *ngIf="venueDetails">
+     <div class="venue-container">
+        <div class="venueDetails">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-6 text-center">
+          <!-- Name, Address, Phone Number -->
+          <div *ngIf="venueDetails.name">
+            <strong>Name</strong>
+            <p>{{ venueDetails.name }}</p>
+          </div>
+          <div *ngIf="venueDetails.address || venueDetails.city || venueDetails.state">
+            <strong>Address</strong>
+            <p>{{ venueDetails.address.line1 }}{{venueDetails.address.line1 && (venueDetails.city || venueDetails.state) ? ', ' : ''}}{{ venueDetails.city.name }}{{venueDetails.city.name && venueDetails.state ? ', ' : ''}}{{ venueDetails.state?.stateCode }}</p>
+          </div>
+          <div *ngIf="venueDetails.boxOfficeInfo && venueDetails.boxOfficeInfo.phoneNumberDetail">
+            <strong>Phone Number</strong>
+            <p>{{ venueDetails.boxOfficeInfo.phoneNumberDetail }}</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 text-center">
+          <!-- Open Hours, General Rule, Child Rule -->
+          <div class="rule-container">
+            <strong>Open Hours</strong>
+            <p [class.collapsed]="!expandedSections['openHours']">{{ venueDetails.boxOfficeInfo?.openHoursDetail ? venueDetails.boxOfficeInfo.openHoursDetail : 'No Information' }}</p>
+            <button (click)="toggleSection('openHours')" class="btn btn-link btn-sm show-more">
+              {{ expandedSections['openHours'] ? 'Show Less' : 'Show More' }}
+              <i [ngClass]="expandedSections['openHours'] ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
+            </button>
+          </div>
+          <div class="rule-container">
+            <strong>General Rule</strong>
+            <p [class.collapsed]="!expandedSections['generalRules']">{{ venueDetails.generalInfo?.generalRule ? venueDetails.generalInfo.generalRule : 'No Information' }}</p>
+            <button (click)="toggleSection('generalRules')" class="btn btn-link btn-sm show-more">
+              {{ expandedSections['generalRules'] ? 'Show Less' : 'Show More' }}
+              <i [ngClass]="expandedSections['generalRules'] ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
+            </button>
+          </div>
+          <div class="rule-container">
+            <strong>Child Rule</strong>
+            <p [class.collapsed]="!expandedSections['childRules']">{{ venueDetails.generalInfo?.childRule ? venueDetails.generalInfo.childRule : 'No Information' }}</p>
+            <button (click)="toggleSection('childRules')" class="btn btn-link btn-sm show-more">
+              {{ expandedSections['childRules'] ? 'Show Less' : 'Show More' }}
+              <i [ngClass]="expandedSections['childRules'] ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col text-center">
+          <button (click)="openMap()" class="btn btn-danger">Show venue on Google map</button>
+        </div>
+      </div>
+    </div>
+     </div>
+  </ng-container>
+     <div *ngIf="showMap" class="map-modal">
+    <div class="card map-modal-card">
+      <div class="card-header">
+        Event Venue
+      </div>
+      <div class="card-body">
+        <div class="map-modal-content">
+          <google-map [options]="mapOptions" [center]="mapCenter" [zoom]="mapZoom" height="100%" width="100%">
+            <map-marker [position]="mapCenter" [options]="markerOptions"></map-marker>
+          </google-map>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button (click)="closeMap()" class="btn btn-dark close-map-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+

@@ -1,0 +1,21 @@
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: scroll;
+}
+
+body {
+  background-image: url('assets/background.jpg');
+  background-size: cover;
+  position: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+}
+
+
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

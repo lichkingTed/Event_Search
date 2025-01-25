@@ -1,0 +1,22 @@
+.nav-link {
+
+  border-radius: 15px;
+  padding: 5px 15px;
+  color: white;
+}
+
+.navbar {
+  background-color: transparent !important;
+}
+
+.active-link {
+  border: 1px solid white;
+  background-color: transparent;
+  color: white;
+}
+
+
+
+
+
+

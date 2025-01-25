@@ -1,0 +1,36 @@
+
+<div class="table-container min-vw-100 align-items-center  "  >
+  <div *ngIf="favorites && favorites.length > 0; else noFavorites">
+    <table class="table table-striped favorites-table " style="background: white">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Event</th>
+        <th scope="col">Category</th>
+        <th scope="col">Venue</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let event of favorites; index as i">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ event.date }}</td>
+        <td>{{ event.name }}</td>
+        <td>{{ event.category }}</td>
+        <td>{{ event.venue }}</td>
+        <td><button (click)="removeFavorite(event)" class="btn btn-danger btn-sm">&#x1F5D1;</button></td>
+      </tr>
+    </tbody>
+    </table>
+  </div>
+</div>
+
+
+<ng-template #noFavorites >
+  <div class="text-center mt-5 " style="background: white; color: red; font-weight: bold">
+    <h3>No favorite events to show</h3>
+  </div>
+</ng-template>
+
+

@@ -1,0 +1,15 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+
+}
+
+
+html,body{
+  overflow: scroll;
+}
+.content-container {
+  padding-top: 56px;
+  width: 100%;
+
+}

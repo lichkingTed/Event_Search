@@ -1,0 +1,343 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 15px;
+  padding-top: 3rem;
+}
+
+html,body{
+  height: 100%;
+  overflow-y: auto;
+}
+
+
+.form-group{
+  color: aqua;
+  padding: 10px;
+}
+.search-form-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  width: 50%;
+    margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+.form-check-label{
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  color: white;
+  font-family: Georgia Serif, serif;
+  margin-bottom: 20px;
+}
+
+.details-card{
+    background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  width: 60%;
+  min-width: 100%;
+    margin-top: auto;
+  margin-bottom: auto;
+  overflow: auto;
+  z-index: 1;
+}
+
+.bg-mint {
+  background-color: #3EB489;
+}
+
+h2.event-name {
+  text-align: center;
+  color: white;
+}
+
+@media (max-width: 767px) {
+  .nav-tabs .nav-link {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+
+.nav-link.active {
+
+  background-color: transparent !important;
+
+}
+
+
+.nav-tabs {
+  background-color: #3EB489;
+}
+
+.selected-tab {
+  border-bottom: 2px solid transparent;
+}
+
+.selected-tab.active {
+  border-bottom: 2px solid #007bff;
+}
+
+
+.details-table strong{
+  font-weight: bold;
+  font-size: 15px;
+  color: aqua;
+}
+
+.details-table p {
+  color: white;
+}
+
+.details-table span {
+  color: white;
+}
+
+/* Add the following CSS */
+.share-icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.share-icons img {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.music_artist_info span{
+  font-weight: bold;
+  color: aqua;
+  font-size: 15px;
+}
+
+
+
+
+.carousel-content-container {
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+
+.carousel-control-custom {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+}
+
+
+
+.carousel-control-prev,
+.carousel-control-next {
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+
+@media (max-width: 575.98px) {
+  .carousel-control-prev,
+  .carousel-control-next {
+    transform: translateY(-50%) scale(1.5);
+  }
+
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon{
+    width: 20px;
+    height: 20px;
+    background-size: 30px 30px;
+  }
+
+  .carousel-control-prev {
+    left: 10%;
+    margin-right: 0;
+  }
+
+  .carousel-control-next {
+    right: 10%;
+    margin-left: 0;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+.venue-container {
+  overflow: auto;
+  height: auto;
+ max-height: 100%;
+}
+
+
+@media screen and (max-width: 600px) {
+  .details-card {
+    width: 100%;
+  }
+
+  .venueDetails .row {
+    flex-direction: column;
+  }
+
+  .venueDetails .col-12 {
+    margin-bottom: 20px;
+  }
+
+  .venueDetails .rule-container {
+    margin-bottom: 20px;
+    max-width: 100%;
+  }
+
+
+  .venueDetails  p {
+    word-wrap: break-word;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .rule-container p{
+    max-width: 80%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+
+
+
+
+.venueDetails{
+  color: white;
+}
+
+.venueDetails strong{
+  color: aqua;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+
+.map-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+
+}
+
+.map-modal-card {
+  width: 80%;
+  height: 80%;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.map-modal-content {
+  width: 100%;
+  height: calc(100% - 1.5rem);
+  position: relative;
+}
+
+.google-map {
+  height: 100%;
+  width: 100%;
+}
+
+.close-map-btn {
+  position: static;
+  margin-top: 5px;
+}
+
+.collapsed {
+  max-height: 1.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+
+
+.favorite {
+  color: red;
+}
+
+.tab-content-container {
+  width: 90%;
+  max-width: 100%;
+  overflow: hidden;
+
+}
+
+
+.status {
+  min-width: 25%;
+  width: 25%;
+  margin: auto;
+  line-height: 1.2;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.onsale {
+  color: white;
+  background-color: green;
+  display: inline-block;
+   padding: 2px 6px;
+}
+
+.offsale {
+  color: white;
+  background-color: red;
+}
+
+.canceled {
+  color: white;
+  background-color: black;
+}
+
+.postponed, .rescheduled {
+  color: white;
+  background-color: orange;
+}
+
+
+.cus-fa-size {
+  font-size: 20px;
+  padding: 10px;
+}
+
